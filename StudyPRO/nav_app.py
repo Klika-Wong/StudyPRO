@@ -1,16 +1,19 @@
 import streamlit as st
+import os
+from dotenv import load_dotenv
 
-require('dotenv').config(); // 引入 dotenv 模块并加载环境变量
 
-const mysql = require('mysql');
 
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-});
+# 加载 .env 文件
+load_dotenv()
+
+# 获取环境变量
+db_host = os.getenv("DB_HOST")
+db_port = os.getenv("DB_PORT")
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+db_database = os.getenv("DB_DATABASE")
+
 
 connection.connect((err) => {
   if (err) throw err;
