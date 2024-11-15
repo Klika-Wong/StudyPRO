@@ -1,5 +1,21 @@
 import streamlit as st
 
+require('dotenv').config(); // 引入 dotenv 模块并加载环境变量
+
+const mysql = require('mysql');
+
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+});
+
+connection.connect((err) => {
+  if (err) throw err;
+  console.log("Connected to MySQL database!");
+});
 
 
 st.title("enter id")
