@@ -1,7 +1,7 @@
 import streamlit as st
 
 
-st.image("./Logo.png", width=100)
+st.image("Logo.png", width=100)
 st.title("enter id")
 user_id = st.text_input("user ID:")
 if user_id:
