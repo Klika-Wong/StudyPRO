@@ -1,3 +1,4 @@
+import mysql.connector
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -24,6 +25,8 @@ if not st.session_state.get("authenticated"):
                 st.error("User ID or password is incorrect.")
             except (RuntimeError, ValueError) as exc:
                 st.error(str(exc))
+            except mysql.connector.Error:
+                st.error("Unable to access the user database. Check its setup and connection.")
 
     with register_tab:
         with st.form("register_form"):
@@ -41,6 +44,8 @@ if not st.session_state.get("authenticated"):
                     st.success("Account created. Log in to continue.")
                 except (RuntimeError, ValueError) as exc:
                     st.error(str(exc))
+                except mysql.connector.Error:
+                    st.error("Unable to access the user database. Check its setup and connection.")
     st.stop()
 
 st.write(f"Signed in as {st.session_state.user_id}")
