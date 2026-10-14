@@ -6,12 +6,13 @@ import mysql.connector
 
 def _connect(database):
     password = os.getenv("DB_PASSWORD")
-    if not password:
-        raise RuntimeError("Set DB_PASSWORD before connecting to the database.")
+    user = os.getenv("DB_USER")
+    if not password or not user:
+        raise RuntimeError("Set DB_USER and DB_PASSWORD before connecting to the database.")
 
     return mysql.connector.connect(
         host=os.getenv("DB_HOST", "localhost"),
-        user=os.getenv("DB_USER", "root"),
+        user=user,
         password=password,
         port=int(os.getenv("DB_PORT", "3306")),
         database=os.getenv("DB_NAME", database),
