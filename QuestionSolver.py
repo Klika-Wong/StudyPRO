@@ -12,7 +12,12 @@ from openai import OpenAI
 import base64
 import openai
 load_dotenv()
-client = OpenAI(api_key = os.environ.get('OPENAI_API_KEY'))
+
+if not st.session_state.get("authenticated"):
+    st.info("Log in from the StudyPRO navigation page to continue.")
+    st.stop()
+
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 import streamlit as st
 from io import BytesIO
 
