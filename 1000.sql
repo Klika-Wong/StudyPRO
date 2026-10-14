@@ -74,10 +74,6 @@ USE userdetails;
 INSERT INTO study_process (user_id, question_id, qestion_time, qestion_type, correct_questions, incorrect_questions, total_questions, study_notes)
 VALUES ('1q', 1, NOW(), 'Multiple Choice', 1, 0, 1, 'Correct answer');
 
-
-
--- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
-
 SELECT * FROM user_d;
 SELECT * FROM questionbank.questions;
 SELECT * FROM study_process;
