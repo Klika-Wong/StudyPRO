@@ -1,62 +1,48 @@
-import streamlit as st
-from Analyser import parse_input, generate_line_chart
 import os
-from fetchdb import fetch_records
-import openai 
+
+import pandas as pd
+import streamlit as st
+from dotenv import load_dotenv
 from openai import OpenAI
+
+from Analyser import generate_line_chart
+from fetchdb import fetch_study_scores
 
 load_dotenv()
 
-user_id = st.session_state.get("user_id")
-if user_id is None:
-    user_id = st.text_input("User ID")
-    if user_id:
-        st.session_state.user_id = user_id
-
-if not user_id:
-    st.info("Enter your user ID to continue.")
+if not st.session_state.get("authenticated"):
+    st.info("Log in from the StudyPRO navigation page to continue.")
     st.stop()
 
-results_up = fetch_records(user_id)
+st.title("Study Progress")
+st.caption("This chart uses saved study records; it does not generate or predict scores.")
 
-client = OpenAI(api_key = os.environ.get('OPENAI_API_KEY'))
+user_id = st.session_state.user_id
+try:
+    records = fetch_study_scores(user_id)
+except (RuntimeError, ValueError) as exc:
+    st.error(str(exc))
+    st.stop()
 
-
-
-if st.button("Generate predictive analysis chart"):
-    
-    
-        if not hasattr(st.session_state, 'api_called') or not st.session_state.api_called:
-            st.session_state.api_called = True  
-        response5 = client.chat.completions.create(
-            model = 'gpt-4o-mini',
-            messages = [
-                {"role":"system","content":""" Please integrate the input content into a form that can be imported into the database 
-                 (Python dictionary).Don't mention any other words,but dictionary. {chat}Here is data to analysis, And language use same. 
-                 The format is as follows:
-                'time:1,2,3,4,5;English:10,11,12,13,14;Chinese:14,13,12,11,10;Geograph:10,12,14,16,18'"""},
-                {"role":"user","content": " output data for diagrame"}
-        ],
-        temperature = 0.2,
-        max_tokens = 500,
-        n = 1,
-        )    
-
-
-        re = response5.choices[0].message.content
-
-
-
-    ##############
-        chart_data = parse_input(re)  
-    
-        if chart_data is not None:
-            st.write("Parsed data:")
-            st.write(chart_data)
-        
-        #generate chart
-            generate_line_chart(chart_data)
- 
-    ###############
-
-
+if not records:
+    st.info("No study score records are available yet.")
+else:
+    scores = pd.DataFrame(
+        records,
+        columns=["study_date", "correct_count", "total_count"],
+    )
+    scores["correct_count"] = pd.to_numeric(scores["correct_count"], errors="coerce").fillna(0)
+    scores["total_count"] = pd.to_numeric(scores["total_count"], errors="coerce").fillna(0)
+    scores = scores[scores["total_count"] > 0].copy()
+    if scores.empty:
+        st.info("Study records exist, but they do not contain score totals yet.")
+    else:
+        scores["accuracy_percent"] = (
+            scores["correct_count"] / scores["total_count"] * 100
+        ).clip(0, 100)
+        generate_line_chart(scores)
+        st.dataframe(
+            scores[["study_date", "correct_count", "total_count", "accuracy_percent"]],
+            hide_index=True,
+            use_container_width=True,
+        )
