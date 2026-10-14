@@ -100,7 +100,12 @@ else:
             if answer is None:
                 st.warning("Choose an answer before submitting.")
             else:
-                is_correct = str(answer).strip() == str(question[4]).strip()
+                correct_answer = str(question[4]).strip()
+                selected_text = str(options[answer]).strip()
+                is_correct = (
+                    str(answer).strip() == correct_answer
+                    or selected_text == correct_answer
+                )
                 try:
                     record_study_result(
                         st.session_state.user_id,
