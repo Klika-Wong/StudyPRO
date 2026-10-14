@@ -12,12 +12,13 @@ _ITERATIONS = 310_000
 
 def _connect():
     password = os.getenv("DB_PASSWORD")
-    if not password:
-        raise RuntimeError("Set DB_PASSWORD before connecting to the database.")
+    user = os.getenv("DB_USER")
+    if not password or not user:
+        raise RuntimeError("Set DB_USER and DB_PASSWORD before connecting to the database.")
 
     return mysql.connector.connect(
         host=os.getenv("DB_HOST", "localhost"),
-        user=os.getenv("DB_USER", "root"),
+        user=os.getenv("DB_USER"),
         password=password,
         port=int(os.getenv("DB_PORT", "3306")),
         database="userdetails",
