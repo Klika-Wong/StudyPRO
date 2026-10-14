@@ -15,14 +15,10 @@ CREATE TABLE user_d (
     user_id CHAR(10) PRIMARY KEY,
     user_email VARCHAR(100),
     user_name VARCHAR(20),
-    user_password VARCHAR(20)
+    user_password_hash VARCHAR(255)
 );
-
--- 插入示例数据
-INSERT INTO user_d (user_id, user_email, user_name, user_password) VALUES 
-('1q', 'user102@example.com', '1a', '111'),
-('2w', 'user345@example.com', '2b', '222'),
-('3e', 'user678@example.com', '3c', '333');
+ 
+-- Add user records through an application that stores password hashes.
 
 -- drop table study_process;
 
@@ -40,7 +36,7 @@ USE questionbank;
 
 
 
-drop table questions;
+DROP TABLE IF EXISTS questions;
 
 -- 创建 questions 表
 
