@@ -17,6 +17,44 @@ import streamlit as st
 from io import BytesIO
 
 # 设置 Streamlit 页面标题
+def save_question_response(raw_response):
+    try:
+        question_data = json.loads(raw_response)
+    except (TypeError, json.JSONDecodeError) as exc:
+        st.error("The generated question data was not valid JSON; nothing was saved.")
+        return
+
+    if not isinstance(question_data, dict):
+        st.error("The generated question data had an unexpected format; nothing was saved.")
+        return
+
+    required_fields = {
+        "question_text",
+        "question_type",
+        "question_options",
+        "correct_answer",
+        "difficulty_level",
+        "subjects",
+    }
+    if not required_fields.issubset(question_data):
+        st.error("The generated question data was incomplete; nothing was saved.")
+        return
+
+    user_id = st.session_state.get("user_id")
+    if user_id is None:
+        st.error("Enter your user ID before saving a question.")
+        return
+
+    try:
+        insert_questions.insert_question(
+            question_data=question_data,
+            user_id=user_id,
+            database="questionbank",
+        )
+    except (ValueError, RuntimeError) as exc:
+        st.error(str(exc))
+
+
 st.title("QuestionSolver")
 #type question
 user_input = st.chat_input("Type your question ")
@@ -60,10 +98,7 @@ if user_input:
 
     sql_info = response2.choices[0].message.content
     
-    #upload to database
-    sql_infoo = json.loads(sql_info)
-    user_id = st.session_state.get("user_id", None)
-    question_id = insert_questions.insert_question(question_data=sql_infoo, user_id = user_id , database="questionbank")
+    save_question_response(sql_info)
     
     
     
@@ -133,10 +168,7 @@ if uploaded_file is not None:
 
     sql_info = response3.choices[0].message.content
     
-    #upload to database
-    sql_infoo = json.loads(sql_info)
-    user_id = st.session_state.get("user_id", None)
-    question_id = insert_questions.insert_question(question_data=sql_infoo, user_id = user_id , database="questionbank")
+    save_question_response(sql_info)
     
 
 
