@@ -1,9 +1,6 @@
-import os
-
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
-from openai import OpenAI
 
 from Analyser import generate_line_chart
 from fetchdb import fetch_study_scores
