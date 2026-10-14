@@ -7,6 +7,7 @@ from email import base64mime
 import os
 from dotenv import load_dotenv
 import streamlit as st
+import mysql.connector
 from PIL import Image
 from openai import OpenAI
 import base64
@@ -20,6 +21,7 @@ if not st.session_state.get("authenticated"):
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 import streamlit as st
 from io import BytesIO
+from fetchdb import fetch_records, record_study_result
 
 # 设置 Streamlit 页面标题
 def save_question_response(raw_response):
@@ -61,6 +63,57 @@ def save_question_response(raw_response):
 
 
 st.title("QuestionSolver")
+
+st.subheader("Practice a saved question")
+try:
+    practice_questions = fetch_records(st.session_state.user_id)
+except (RuntimeError, mysql.connector.Error) as exc:
+    st.error("Could not load saved questions. Check the database connection and schema.")
+    st.stop()
+
+if not practice_questions:
+    st.info("Save a question first, then you can practice it here.")
+else:
+    question = st.selectbox(
+        "Choose a question",
+        practice_questions,
+        format_func=lambda row: str(row[1])[:100],
+        key="practice_question",
+    )
+    try:
+        options = json.loads(question[3]) if isinstance(question[3], str) else question[3]
+    except (TypeError, json.JSONDecodeError):
+        options = None
+
+    if isinstance(options, dict) and options:
+        with st.form("practice_answer_form"):
+            st.write(question[1])
+            answer = st.radio(
+                "Your answer",
+                list(options.keys()),
+                format_func=lambda key: f"{key}: {options[key]}",
+                index=None,
+            )
+            submitted = st.form_submit_button("Submit answer")
+
+        if submitted:
+            if answer is None:
+                st.warning("Choose an answer before submitting.")
+            else:
+                is_correct = str(answer).strip() == str(question[4]).strip()
+                try:
+                    record_study_result(
+                        st.session_state.user_id,
+                        question[0],
+                        question[2],
+                        is_correct,
+                    )
+                    st.success("Correct!" if is_correct else "Not quite. Your answer was recorded.")
+                except (RuntimeError, ValueError):
+                    st.error("The answer could not be saved to your study history.")
+    else:
+        st.warning("This question has no valid multiple-choice options, so it cannot be practiced.")
+
 #type question
 user_input = st.chat_input("Type your question ")
 
@@ -119,8 +172,7 @@ if uploaded_file is not None:
     
     st.image(image, caption="Uploaded Image", use_column_width=True)
     
-    if image.mode == "RGBA":
-        image = image.convert("RGB")
+    image = image.convert("RGB")
     buffered = BytesIO()
     image.save(buffered, format="JPEG")  
     img_bytes = buffered.getvalue()  
