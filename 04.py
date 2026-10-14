@@ -5,16 +5,19 @@ from fetchdb import fetch_records
 import openai 
 from openai import OpenAI
 
-####################
+load_dotenv()
 
-# 设置用户ID
-#user_id = st.session_state.get("user_id", None)  # 要匹配的 user_id 值
-user_id =1
+user_id = st.session_state.get("user_id")
+if user_id is None:
+    user_id = st.text_input("User ID")
+    if user_id:
+        st.session_state.user_id = user_id
 
-# 调用 fetch_records 函数并获取结果，指定数据库和表
+if not user_id:
+    st.info("Enter your user ID to continue.")
+    st.stop()
+
 results_up = fetch_records(user_id)
-####################
-
 
 client = OpenAI(api_key = os.environ.get('OPENAI_API_KEY'))
 
