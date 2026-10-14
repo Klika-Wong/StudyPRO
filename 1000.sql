@@ -11,6 +11,13 @@ CREATE TABLE IF NOT EXISTS user_d (
     user_password_hash VARCHAR(255)
 );
 
+CREATE TABLE IF NOT EXISTS app_users (
+    user_id CHAR(10) PRIMARY KEY,
+    password_salt CHAR(32) NOT NULL,
+    password_hash CHAR(64) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 USE questionbank;
 
 CREATE TABLE IF NOT EXISTS questions (
