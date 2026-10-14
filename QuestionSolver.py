@@ -79,14 +79,14 @@ if user_input:
     response2 = client.chat.completions.create(
         model = 'gpt-4o-mini',
         messages = [
-            {"role":"system","content":"""Please integrate the input content into a form that can be imported into the database (Python dictionary).Don't mention any other words,but dictionary. And language use same. The format is as follows:
+            {"role":"system","content":"""Please integrate the input content into a form that can be imported into the database as strict JSON. Return only the JSON object, with no Markdown or extra prose. And language use same. The format is as follows:
             {
             "question_text": "What is the capital of France?",
             "question_type": "Multiple Choice",
             "question_options": {"A": "Paris", "B": "Berlin", "C": "Madrid", "D": "Rome"},
             "correct_answer": "A",
             "difficulty_level": 2,
-            "subjects": "Geography",  # The added 'subjects' field
+            "subjects": "Geography"
             }"""},
             {"role":"user","content":ai_output}
         ],
@@ -149,14 +149,14 @@ if uploaded_file is not None:
     response3 = client.chat.completions.create(
         model = 'gpt-4o-mini',
         messages = [
-            {"role":"system","content":"""Please integrate the input content into a form that can be imported into the database (Python dictionary).Don't mention any other words,but dictionary. And language use same. The format is as follows:
+            {"role":"system","content":"""Please integrate the input content into a form that can be imported into the database as strict JSON. Return only the JSON object, with no Markdown or extra prose. And language use same. The format is as follows:
             {
             "question_text": "What is the capital of France?",
             "question_type": "Multiple Choice",
             "question_options": {"A": "Paris", "B": "Berlin", "C": "Madrid", "D": "Rome"},
             "correct_answer": "A",
             "difficulty_level": 2,
-            "subjects": "Geography",  # The added 'subjects' field
+            "subjects": "Geography"
             }"""},
             {"role":"user","content":ai_output}
         ],
