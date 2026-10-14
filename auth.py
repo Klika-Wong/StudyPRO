@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import os
 import re
 import secrets
 
@@ -10,15 +11,15 @@ _ITERATIONS = 310_000
 
 
 def _connect():
-    password = secrets.os.getenv("DB_PASSWORD")
+    password = os.getenv("DB_PASSWORD")
     if not password:
         raise RuntimeError("Set DB_PASSWORD before connecting to the database.")
 
     return mysql.connector.connect(
-        host=secrets.os.getenv("DB_HOST", "localhost"),
-        user=secrets.os.getenv("DB_USER", "root"),
+        host=os.getenv("DB_HOST", "localhost"),
+        user=os.getenv("DB_USER", "root"),
         password=password,
-        port=int(secrets.os.getenv("DB_PORT", "3306")),
+        port=int(os.getenv("DB_PORT", "3306")),
         database="userdetails",
     )
 
